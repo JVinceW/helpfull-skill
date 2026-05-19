@@ -1,0 +1,4 @@
+interface:
+  display_name: "resume.io to HTML"
+  short_description: "Convert resume.io resumes to standalone HTML"
+  default_prompt: "Convert this resume.io resume to standalone HTML using the Corporate template."

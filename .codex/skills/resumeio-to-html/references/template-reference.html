@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Resume — Corporate Template</title>
+<style>
+:root{
+  --accent:#0F141F;
+  --text:#222;
+  --muted:#6b7280;
+  --sidebar-bg:#f3f4f6;
+  --page-w: 794px;
+  --page-h: 1123px;
+  --font-primary: "Source Sans Pro","Helvetica Neue",Arial,sans-serif;
+  --font-secondary: "Source Serif Pro",Georgia,serif;
+}
+@page{size:A4;margin:0;background:#fff;}
+*{box-sizing:border-box;}
+html{background:#e5e7eb;}
+body{margin:0;background:#e5e7eb;font-family:var(--font-primary);color:var(--text);}
+.page{width:var(--page-w);min-height:var(--page-h);margin:24px auto;background:#fff;
+      box-shadow:0 4px 20px rgba(0,0,0,.15);display:grid;grid-template-columns:34% 66%;}
+.sidebar{background:var(--sidebar-bg);padding:28px 22px;color:#1f2937;}
+.avatar-wrap{width:160px;height:160px;border-radius:50%;overflow:hidden;margin:0 auto 18px;background:#ddd;}
+.avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.sidebar h2,.main h2{font-family:var(--font-secondary);font-size:13px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--accent);margin:22px 0 8px;
+  border-bottom:1px solid #d1d5db;padding-bottom:4px;}
+.kv{font-size:11.5px;line-height:1.5;}
+.kv .label{color:var(--muted);display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;}
+.kv + .kv{margin-top:8px;}
+.kv a{color:var(--accent);text-decoration:none;word-break:break-all;}
+.skill,.lang{font-size:11.5px;margin:7px 0;}
+.bar{height:4px;background:#d1d5db;border-radius:2px;margin-top:3px;overflow:hidden;}
+.bar > span{display:block;height:100%;background:var(--accent);}
+.main{padding:28px 26px;}
+.header h1{font-family:var(--font-secondary);font-size:30px;margin:0;color:var(--accent);
+  line-height:1.1;letter-spacing:.01em;}
+.header .role{font-size:14px;color:var(--muted);margin-top:4px;}
+.entry{margin-bottom:14px;}
+.entry .row1{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;}
+.entry .title{font-weight:600;}
+.entry .meta{color:var(--muted);font-size:11.5px;}
+.entry .body,.profile{font-size:12px;line-height:1.5;}
+.entry .body ul,.profile ul{margin:4px 0 0 18px;padding:0;}
+.entry .body p,.profile p{margin:4px 0;}
+@media print{
+  html,body{width:var(--page-w);margin:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .page{box-shadow:none;margin:0;break-after:page;}
+}
+</style>
+</head>
+<body>
+<div class="page" id="page"></div>
+
+<!-- ============ DATA ============ -->
+<script>
+/* INJECT_RESUME_HERE — replace this entire comment with:
+   window.RESUME = { ... }   conforming to the schema below.
+
+== RESUME SCHEMA ==
+{
+  meta: {
+    accent: "#0F141F",                    // CSS color, drives --accent
+    sectionsOrder: [                       // main column, in order
+      "profile" | "workExperiences" | "educations" | "custom:<key>"
+    ],
+    sidebarOrder: [                        // sidebar, in order
+      "details" | "links" | "skills" | "languages" | "hobbies"
+    ]
+  },
+  header: {
+    fullName: string,
+    role:     string,
+    avatar:   string (url or data:URI, optional)
+  },
+  details: {                               // sidebar key/value rows
+    [Label]: string | { text: string, href: string }
+  },
+  links: [                                 // sidebar link rows
+    { label: string, text: string, href: string }
+  ],
+  skills: [
+    { name: string, level: "beginner" | "skillful" | "experienced" | "expert" }
+  ],
+  languages: [
+    { name: string,
+      level: "elementary" | "low_intermediate" | "upper_intermediate"
+           | "advanced" | "native" }
+  ],
+  hobbies: string (HTML allowed),
+  profile: string (HTML allowed),
+  work: [
+    { title, meta, location, body }       // body is HTML
+  ],
+  education: [
+    { title, meta, location, body }
+  ],
+  custom: {
+    [key]: { heading: string, items: [ { title, meta, location, body } ] }
+  }
+}
+*/
+</script>
+
+<!-- ============ RENDERER ============ -->
+<script>
+const SKILL_PCT  = { beginner:25, skillful:60, experienced:85, expert:100 };
+const LANG_LABEL = { native:"Native", advanced:"Advanced",
+  upper_intermediate:"Upper intermediate",
+  low_intermediate:"Lower intermediate", elementary:"Elementary" };
+
+function entry({ title, meta, location, body }) {
+  return `<div class="entry">
+    <div class="row1">
+      <span class="title">${title||""}</span>
+      ${meta?`<span class="meta">${meta}</span>`:""}
+    </div>
+    ${location?`<div class="meta">${location}</div>`:""}
+    ${body?`<div class="body">${body}</div>`:""}
+  </div>`;
+}
+
+const SIDEBAR = {
+  details(r){
+    const rows = Object.entries(r.details||{}).map(([k,v])=>{
+      const inner = (v && typeof v==="object" && v.href)
+        ? `<a href="${v.href}">${v.text||v.href}</a>` : (v||"");
+      return `<div class="kv"><span class="label">${k}</span>${inner}</div>`;
+    }).join("");
+    return rows ? `<h2>Details</h2>${rows}` : "";
+  },
+  links(r){
+    if(!r.links||!r.links.length) return "";
+    const rows = r.links.map(l=>`<div class="kv"><span class="label">${l.label}</span>${
+      l.href?`<a href="${l.href}">${l.text||l.href}</a>`:(l.text||"")}</div>`).join("");
+    return `<h2>Links</h2>${rows}`;
+  },
+  skills(r){
+    if(!r.skills||!r.skills.length) return "";
+    const rows = r.skills.map(s=>{
+      const pct = SKILL_PCT[s.level] ?? 60;
+      return `<div class="skill">${s.name} <div class="bar"><span style="width:${pct}%"></span></div></div>`;
+    }).join("");
+    return `<h2>Skills</h2>${rows}`;
+  },
+  languages(r){
+    if(!r.languages||!r.languages.length) return "";
+    const rows = r.languages.map(l=>
+      `<div class="lang">${l.name} — <em>${LANG_LABEL[l.level]||l.level||""}</em></div>`
+    ).join("");
+    return `<h2>Languages</h2>${rows}`;
+  },
+  hobbies(r){
+    if(!r.hobbies) return "";
+    return `<h2>Hobbies</h2><div class="kv">${r.hobbies}</div>`;
+  }
+};
+
+const MAIN = {
+  profile(r){ return r.profile?`<h2>Profile</h2><div class="profile">${r.profile}</div>`:""; },
+  workExperiences(r){ return (r.work&&r.work.length)?`<h2>Employment History</h2>${r.work.map(entry).join("")}`:""; },
+  educations(r){ return (r.education&&r.education.length)?`<h2>Education</h2>${r.education.map(entry).join("")}`:""; },
+  customSection(r,key){
+    const sec = r.custom && r.custom[key];
+    if(!sec) return "";
+    return `<h2>${sec.heading}</h2>${(sec.items||[]).map(entry).join("")}`;
+  }
+};
+
+function render(RESUME){
+  if(!RESUME){ document.getElementById("page").innerHTML =
+    `<div style="padding:40px;font-family:sans-serif">
+      <h2>No RESUME data found</h2>
+      <p>Replace the <code>INJECT_RESUME_HERE</code> marker with a
+      <code>window.RESUME = {...}</code> assignment.</p></div>`; return; }
+  document.documentElement.style.setProperty("--accent", RESUME.meta?.accent || "#0F141F");
+  const sidebarHTML = (RESUME.meta?.sidebarOrder||[]).map(k=>SIDEBAR[k]?SIDEBAR[k](RESUME):"").join("");
+  const mainHTML = (RESUME.meta?.sectionsOrder||[]).map(k=>{
+    if(k.startsWith("custom:")) return MAIN.customSection(RESUME, k.split(":")[1]);
+    return MAIN[k]?MAIN[k](RESUME):"";
+  }).join("");
+  document.getElementById("page").innerHTML = `
+    <aside class="sidebar">
+      <div class="avatar-wrap">${RESUME.header?.avatar?`<img src="${RESUME.header.avatar}" alt="">`:""}</div>
+      ${sidebarHTML}
+    </aside>
+    <main class="main">
+      <header class="header">
+        <h1>${RESUME.header?.fullName||""}</h1>
+        ${RESUME.header?.role?`<div class="role">${RESUME.header.role}</div>`:""}
+      </header>
+      ${mainHTML}
+    </main>`;
+}
+
+render(window.RESUME);
+</script>
+</body>
+</html>
