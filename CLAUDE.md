@@ -37,3 +37,4 @@ Skills are **stateless**: they must not persist data between runs beyond the act
 | Directory     | Skill name           | What it does                                              |
 |---------------|----------------------|-----------------------------------------------------------|
 | `resume.io/`  | `resumeio-to-html`   | Fetches a resume.io resume via API and renders it as a standalone HTML CV using the Corporate template |
+| `statement-expense-tracker/` | `statement-expense-tracker` | Extracts a card/bank statement into normalized JSON, reconciles it, and generates a monthly expense workbook plus an all-statements overview (scripts in `scripts/`) |

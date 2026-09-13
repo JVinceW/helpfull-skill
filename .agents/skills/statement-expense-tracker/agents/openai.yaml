@@ -1,0 +1,4 @@
+interface:
+  display_name: "Statement expense tracker"
+  short_description: "Turn card or bank statements into reconciled expense workbooks"
+  default_prompt: "Use $statement-expense-tracker to analyze this statement and update my expense workbooks."

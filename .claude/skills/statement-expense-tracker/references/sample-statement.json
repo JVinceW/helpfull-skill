@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "period": "2026-01",
+  "institution": "Example Bank",
+  "account_label": "Visa ****1234",
+  "currency": "USD",
+  "statement": {
+    "statement_date": "2026-01-25",
+    "due_date": "2026-02-19",
+    "opening_balance": 820.40,
+    "total_debits": 459.24,
+    "total_credits": 845.40,
+    "closing_balance": 434.24,
+    "minimum_payment": 35.00,
+    "credit_limit": 5000
+  },
+  "transactions": [
+    {"transaction_date": "2025-12-27", "posting_date": "2025-12-29", "description": "PAYMENT THANK YOU", "type": "payment", "amount": 820.40},
+    {"transaction_date": "2025-12-28", "posting_date": "2025-12-30", "description": "UBER *TRIP", "type": "spend", "amount": 18.75},
+    {"transaction_date": "2025-12-30", "posting_date": "2026-01-02", "description": "WHOLE FOODS MARKET #102", "type": "spend", "amount": 64.32},
+    {"transaction_date": "2026-01-02", "posting_date": "2026-01-03", "description": "NETFLIX.COM", "type": "spend", "amount": 15.49},
+    {"transaction_date": "2026-01-04", "posting_date": "2026-01-05", "description": "SHELL OIL 57442", "type": "spend", "amount": 48.10},
+    {"transaction_date": "2026-01-06", "posting_date": "2026-01-07", "description": "UBER EATS", "type": "spend", "amount": 27.80},
+    {"transaction_date": "2026-01-09", "posting_date": "2026-01-10", "description": "AMAZON MKTPLACE PMTS", "type": "spend", "amount": 89.99},
+    {"transaction_date": "2026-01-12", "posting_date": "2026-01-13", "description": "AMAZON MKTPLACE PMTS", "type": "refund", "amount": 25.00, "note": "Returned item"},
+    {"transaction_date": "2026-01-15", "posting_date": "2026-01-16", "description": "OPENAI *CHATGPT SUBSCR", "type": "spend", "amount": 20.00},
+    {"transaction_date": "2026-01-18", "posting_date": "2026-01-19", "description": "CVS/PHARMACY #0231", "type": "spend", "amount": 12.45},
+    {"transaction_date": "2026-01-20", "posting_date": "2026-01-21", "description": "SPOTIFY P0A1B2C3", "type": "spend", "amount": 11.99},
+    {"transaction_date": "2026-01-21", "posting_date": "2026-01-23", "description": "HOTEL TOKYO SHINJUKU", "type": "spend", "amount": 142.60, "original_amount": 22000, "original_currency": "JPY"},
+    {"transaction_date": "2026-01-22", "posting_date": "2026-01-23", "description": "SQ *BLUE BOTTLE COFFEE", "type": "spend", "amount": 6.50},
+    {"transaction_date": "2026-01-23", "posting_date": "2026-01-23", "description": "FOREIGN TRANSACTION FEE", "type": "fee", "amount": 1.25}
+  ]
+}
