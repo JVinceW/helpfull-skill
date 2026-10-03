@@ -126,9 +126,18 @@ transaction, or a duplicated row.
 
 Add short notes here when a new issuer's layout needs special handling.
 
-- **ACB (Vietnam) credit card**: charges are printed negative; credits end with `CR`.
+- **ACB (Vietnam) credit card** (`scripts/extract_acb.py` automates all of this):
+  charges are printed negative; credits end with `CR`.
   "Phát sinh nợ trong kỳ" = `total_debits`, "Phát sinh có trong kỳ" = `total_credits`,
-  "Số dư đầu kỳ" / "Dư nợ cuối kỳ" = opening / closing balance (store as positive when owed),
+  "Số dư đầu kỳ" = `opening_balance`, "Dư nợ tại ngày lập bảng" (Statement Balance) =
+  `closing_balance` (store as positive when owed). Do not use "Số dư cuối kỳ" (Closing
+  Balance): it adds installment principal not yet billed, so it breaks reconciliation
+  rule 3 whenever an installment plan is running.
   "Số tiền thanh toán tối thiểu" = `minimum_payment`. Detail lines start with
-  `Retail <COUNTRY> <CITY>`; payments show only a reference such as `…#GLR#C#…`.
+  `Retail <COUNTRY> <CITY>`; the city field is at most 13 characters and undelimited.
+  Payments show only a reference such as `…#GLR#C#…`.
   Foreign purchases show the original amount in the "Transaction Amount" column.
+  Installments: `INSTL CREATION-<merchant>-TENOR` (CR) is the conversion credit → `refund`
+  with the purchase's description; `INSTL CREATION FEE-…` → `fee`; `INSTL-<merchant>-TENOR k/n`
+  is the monthly charge → `spend`. The "CHI TIẾT TRẢ GÓP" table is a summary; skip it.
+  A top-level `"note"` may record the unbilled installment principal; the scripts ignore it.

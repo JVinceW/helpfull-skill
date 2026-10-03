@@ -53,7 +53,14 @@ If a precondition fails: STOP, tell the user what is missing.
    `references/config.example.json` (English) or `references/config.example.vi.json`
    (Vietnamese, VND), set `currency` to match the statement, and tell the user the
    categories and budgets are placeholders to review. Never overwrite an existing config.
-3. Extract: read every page of the statement (use page ranges for long PDFs) and write
+3. Extract. Fast path for ACB (Vietnam) credit-card PDFs (`BTBGDyyyymm.pdf`, header
+   "ACB CREDIT CARD STATEMENT"): if `pypdf` is available (ask before installing it), run
+   `python "${CLAUDE_SKILL_DIR}/scripts/extract_acb.py" "<statement.pdf>" --out-dir data`
+   from `trackerDir`. Exit `0`: done, go to step 4. Exit `3`: fix each `WARN` line in the
+   JSON (trim the city out of a description, or add an unparsed row from the PDF). Exit `2`:
+   re-read the PDF and fix the JSON. Exit `4`: ask before `--force`. Exit `1` (not ACB, or
+   unreadable): extract manually as below.
+   Manual extraction: read every page of the statement (use page ranges for long PDFs) and write
    `data/statement_<period>.json` exactly as `references/mapping.md` specifies: the
    statement summary, every transaction, a masked account label, no names or addresses.
    If the file already exists, show what differs and ask before replacing it.
@@ -110,7 +117,7 @@ If a precondition fails: STOP, tell the user what is missing.
 | Scanned or photographed statement     | Read it visually, double-check every amount, reconcile strictly. |
 | Several cards on one statement        | Ask which card to track; use one tracker folder per card. |
 | Foreign-currency rows                 | `amount` is the billed amount in the statement currency; keep the original in `original_amount` and `original_currency`. |
-| Installment plans                     | Record what is billed this period; mention the plan in `note`. |
+| Installment plans                     | Record what is billed this period; mention the plan in `note`. If a purchase was converted to a plan this period, keep the purchase as `spend` and its conversion credit as `refund` with the same description (so the same category); the conversion fee is `fee`. |
 | Statement shows no totals             | Reconciliation is impossible; say so and ask before `--allow-unreconciled`. |
 | Refund of an earlier purchase         | `type: refund` with the purchase's category so net spend drops. |
 | Period already present in `data/`     | Ask whether this is a corrected statement before replacing it. |
@@ -123,6 +130,7 @@ If a precondition fails: STOP, tell the user what is missing.
 - `references/sample-statement.json`: synthetic statement for smoke tests.
 - `references/google-sheets.md`: optional Google Sheets conversion and browser-automation pitfalls.
 - `references/trigger-snippets.md`: prompts users can paste into a fresh session.
+- `scripts/extract_acb.py`: ACB credit-card PDF → statement JSON fast path (Python 3.9+, `pypdf`).
 - `scripts/build_monthly.py`, `scripts/build_master.py`, `scripts/expense_common.py`:
   workbook generators (Python 3.9+, `openpyxl`).
 

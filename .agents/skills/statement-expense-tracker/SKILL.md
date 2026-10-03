@@ -53,7 +53,7 @@ Scripts live in this skill's `scripts/` folder; below, `<skill-dir>` is the fold
 
 1. Validate preconditions. Resolve `trackerDir`; list existing `data/statement_*.json` files and workbooks.
 2. Config: if `<trackerDir>/expense-config.json` is missing, copy `references/config.example.json` (English) or `references/config.example.vi.json` (Vietnamese, VND), set `currency` to match the statement, and tell the user categories and budgets are placeholders. Never overwrite an existing config.
-3. Extract: read every page of the statement and write `data/statement_<period>.json` exactly as `references/mapping.md` specifies (summary, every transaction, masked account label, no names or addresses). If the file exists, show differences and ask before replacing.
+3. Extract. Fast path for ACB (Vietnam) credit-card PDFs (`BTBGDyyyymm.pdf`, header "ACB CREDIT CARD STATEMENT"): if `pypdf` is available (ask before installing it), run `python <skill-dir>/scripts/extract_acb.py "<statement.pdf>" --out-dir data` from `trackerDir`. Exit `0`: go to step 4. Exit `3`: fix each `WARN` line in the JSON (trim the city out of a description, or add an unparsed row). Exit `2`: re-read the PDF and fix the JSON. Exit `4`: ask before `--force`. Exit `1` (not ACB, or unreadable): extract manually. Manual extraction: read every page of the statement and write `data/statement_<period>.json` exactly as `references/mapping.md` specifies (summary, every transaction, masked account label, no names or addresses). If the file exists, show differences and ask before replacing.
 4. Build the monthly workbook with `trackerDir` as the working directory:
    `python <skill-dir>/scripts/build_monthly.py data/statement_<period>.json --config expense-config.json --out-dir .`
    - Exit `2` (unreconciled): re-read the statement and fix the JSON; never invent, drop, or change transactions to force a match. If it still fails after one careful re-read, show the differences and ask before `--allow-unreconciled`.
@@ -90,7 +90,7 @@ Scripts live in this skill's `scripts/` folder; below, `<skill-dir>` is the fold
 | Scanned or photographed statement | Read it visually, double-check every amount, reconcile strictly. |
 | Several cards on one statement | Ask which card to track; one tracker folder per card. |
 | Foreign-currency rows | `amount` is the billed amount; keep the original in `original_amount` / `original_currency`. |
-| Installment plans | Record what is billed this period; mention the plan in `note`. |
+| Installment plans | Record what is billed this period; mention the plan in `note`. A purchase converted to a plan this period stays `spend`, its conversion credit is `refund` with the same description, and the conversion fee is `fee`. |
 | Statement shows no totals | Say reconciliation is impossible; ask before `--allow-unreconciled`. |
 | Refund of an earlier purchase | `type: refund` with the purchase's category. |
 | Period already in `data/` | Ask whether it is a corrected statement before replacing. |
@@ -104,6 +104,7 @@ Scripts live in this skill's `scripts/` folder; below, `<skill-dir>` is the fold
 - `references/sample-statement.json`: synthetic statement for smoke tests.
 - `references/google-sheets.md`: optional Google Sheets conversion and browser pitfalls.
 - `references/trigger-snippets.md`: user-facing prompt examples.
+- `scripts/extract_acb.py`: ACB credit-card PDF to statement JSON fast path (Python 3.9+, `pypdf`).
 - `scripts/build_monthly.py`, `scripts/build_master.py`, `scripts/expense_common.py`: workbook generators (Python 3.9+, `openpyxl`).
 
 Smoke test: `python scripts/build_monthly.py references/sample-statement.json --config references/config.example.json --out-dir <temp folder>` must exit 0.
